@@ -27,13 +27,25 @@ public class CameraFollow : MonoBehaviour
     [Header("Zoom (stretch)")]
     [SerializeField] private float minZoom = 6f;
     [SerializeField] private float maxZoom = 18f;
+    private float zoomLevel = 14f;
 
     void LateUpdate()
     {
         if (target == null) return;
 
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        zoomLevel -= scroll * 5f;
+        zoomLevel = Mathf.Clamp(zoomLevel, minZoom, maxZoom);
+
+
         // Follow AFTER the player moved — this is why we use LateUpdate.
-        Vector3 desired = target.position + offset;
+        Vector3 desired = target.position + offset.normalized * zoomLevel;
         transform.position = Vector3.Lerp(transform.position, desired, followSharpness * Time.deltaTime);
     }
 }
+
+
+
+
+
+

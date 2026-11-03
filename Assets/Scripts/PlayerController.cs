@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// STARTER — Player controller for the "Orb Collector" lab goal.
@@ -14,12 +16,17 @@ using UnityEngine;
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
+    private Renderer ren ;
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 6f;
 
     [Header("Lab wiring (drag your objects here)")]
     [SerializeField] private GameObject orbPrefab;   // TODO 5: used to spawn a bonus orb
     [SerializeField] private Transform cameraTransform; // used by TODO 3 (camera follow)
+
+    [SerializeField]private Color color;
+
+
 
     private Rigidbody rb;
 
@@ -29,13 +36,16 @@ public class PlayerController : MonoBehaviour
     }
 
     void Start()
-    {
+    {   
+        ren =  GetComponent<Renderer>();
         Debug.Log("[PlayerController] Ready. Collect all orbs to win.");
+       
     }
 
     void Update()
     {
         HandleMovement();
+         ren.material.color = color ;
     }
 
     private void HandleMovement()
@@ -47,7 +57,7 @@ public class PlayerController : MonoBehaviour
 
         // Time.deltaTime makes speed identical at any frame rate (10 FPS or 144 FPS).
         transform.Translate(movement * moveSpeed * Time.deltaTime, Space.World);
-        
+
     }
 
     // ---------------------------------------------------------------
@@ -60,4 +70,39 @@ public class PlayerController : MonoBehaviour
     // TODO 5 (OnDestroy): when the Player is destroyed, Instantiate one
     //       bonus orbPrefab at your last position.
     // ---------------------------------------------------------------
+
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log(collision.gameObject.name);
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Orb"))
+        {
+            Destroy(other.gameObject);
+            GameManager.Instance.Collect();
+            Debug.Log("Orb collect");
+        }
+    }
+
+
+    
+    private void OnDestroy()
+    {
+        if (!gameObject.scene.isLoaded) return;
+  
+        if (orbPrefab != null)
+        {
+            Vector3 spawn = transform.position;
+            Instantiate(orbPrefab, spawn, Quaternion.identity);
+        }
+      
+    }
+
+
 }
+

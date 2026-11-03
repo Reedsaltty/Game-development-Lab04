@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mono.Cecil.Cil;
 using UnityEngine;
 
 /// <summary>
@@ -20,7 +22,10 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [Header("State")]
-    [SerializeField] private int totalOrbs = 5;
+
+
+
+    int totalOrbs;
 
     private int collected;
 
@@ -28,7 +33,7 @@ public class GameManager : MonoBehaviour
     {
         // Simple singleton so the player can call GameManager.Instance.Collect().
         Instance = this;
-
+        totalOrbs = GameObject.FindGameObjectsWithTag("Orb").Length;
         // TODO 6: replace the serialized totalOrbs with a live count:
         // GameObject[] orbs = GameObject.FindGameObjectsWithTag("Orb");
         // totalOrbs = orbs.Length;
@@ -43,8 +48,13 @@ public class GameManager : MonoBehaviour
     void OnGUI()
     {
         // Immediate-mode UI: runs several times per frame, so keep it cheap.
-        GUI.Label(new Rect(12, 10, 400, 30), $"Orbs collected: {collected} / {totalOrbs}", new GUIStyle(GUI.skin.label) { fontSize = 20 });
+        GUI.Label(new Rect(12, 10, 400, 30), $"Orbs collected: {collected} / {totalOrbs}", new GUIStyle(GUI.skin.label) { fontSize = 20, normal ={textColor = Color.white} });
 
         // TODO 7: when collected >= totalOrbs, draw a large centered "YOU WIN!" label.
+        if (collected >= totalOrbs)
+        {
+            GUI.Label(new Rect(0, 0, Screen.width, Screen.height), "You Win!", new GUIStyle(GUI.skin.label) { fontSize = 48, alignment = TextAnchor.MiddleCenter });
+        }
+
     }
 }
